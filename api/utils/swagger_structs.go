@@ -64,6 +64,17 @@ type ResponseUserDetails struct {
 	} `json:"body"`
 }
 
+// swagger:response ResponseEmailExists
+type ResponseEmailExists struct {
+	//in:body
+	Body struct {
+		Status string `json:"status"`
+		Data   struct {
+			Exists bool `json:"exists"`
+		} `json:"data"`
+	} `json:"body"`
+}
+
 // swagger:response ResponseGetRegisteredUser
 type ResponseGetRegisteredUser struct {
 	//in:body

@@ -102,6 +102,38 @@ func (ctrl *UserController) GetUserMeta(c *fiber.Ctx) error {
 	})
 }
 
+// CheckEmailExists checks if an email exists in the database
+// swagger:route GET /v1/user/check-email User CheckEmailExists
+//
+// Check if an email exists.
+//
+//		Consumes:
+//		- application/json
+//
+//		Schemes: http, https
+//
+//		Responses:
+//		  200: ResponseEmailExists
+//	     400: GenericResFailNotFound
+//		  500: GenericResError
+func (ctrl *UserController) CheckEmailExists(c *fiber.Ctx) error {
+	email := c.Query("email")
+	if email == "" {
+		return utils.JSONError(c, http.StatusBadRequest, "email query parameter is required")
+	}
+
+	_, err := ctrl.userModel.GetByEmail(email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return utils.JSONSuccess(c, http.StatusOK, map[string]bool{"exists": false})
+		}
+		ctrl.logger.Error("Error checking email existence", zap.Error(err))
+		return utils.JSONError(c, http.StatusInternalServerError, "Error checking email")
+	}
+
+	return utils.JSONSuccess(c, http.StatusOK, map[string]bool{"exists": true})
+}
+
 // Create Guest user to play for quiz directly without login
 // swagger:route POST /v1/user/{username} User RequestCreateQuickUser
 //

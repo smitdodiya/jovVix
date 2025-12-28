@@ -115,6 +115,25 @@ const handleForgotPassword = async () => {
     toast.error("please enter email first!");
     return;
   }
+
+  // Check if email exists
+  try {
+    const checkResponse = await fetch(`/api/v1/user/check-email?email=${encodeURIComponent(email.value)}`, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    const checkResult = await checkResponse.json();
+    if (!checkResult.data.exists) {
+      toast.error("Email not found. Please check your email address.");
+      return;
+    }
+  } catch (error) {
+    toast.error("Error checking email. Please try again.");
+    console.error(error);
+    return;
+  }
+
   const recoveryResponse = await fetch(
     `${kratosUrl}/self-service/recovery/browser`,
     {
